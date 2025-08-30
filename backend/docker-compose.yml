@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    environment:
+      POSTGRES_USER: taxi
+      POSTGRES_PASSWORD: taxipwd
+      POSTGRES_DB: taxi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d:ro   # يفعّل postgis تلقائياً
+  web:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://taxi:taxipwd@db:5432/taxi_db
+    volumes:
+      - ./app:/app/app
+
+volumes:
+  pgdata:
